@@ -7,4 +7,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Reference Include="ImplementationBase">
+      <HintPath>..\ImplementationBase\bin\Debug\net8.0\ImplementationBase.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

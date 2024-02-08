@@ -1,7 +1,8 @@
-﻿using Data.interfaces;
-using Data.models.enums;
+﻿using ImplementationBase.models.enums;
+using ImplementationBase.interfaces;
+using Task = ImplementationBase.models.Task;
 
-namespace Data.models;
+namespace DataProviderOne;
 
 public class DataProvider : IDataProvider
 {
@@ -15,13 +16,7 @@ public class DataProvider : IDataProvider
         Task task6 = new("Reconcile eith your friend", "you know the right thing to do", DateTime.Now.AddDays(1), Priority.Critical);
         task1.CreationDate = DateTime.Now.AddDays(-1);
 
-        List<Task> myList = new();
-        myList.Add(task1);
-        myList.Add(task2);
-        myList.Add(task3);
-        myList.Add(task4);
-        myList.Add(task5);
-        myList.Add(task6);
+        List<Task> myList = [task1, task2, task3, task4, task5, task6];
 
         return myList;
     }

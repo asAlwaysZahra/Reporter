@@ -1,4 +1,4 @@
-﻿namespace Data.interfaces;
+﻿namespace ImplementationBase.interfaces;
 
 public interface IDataProvider
 {

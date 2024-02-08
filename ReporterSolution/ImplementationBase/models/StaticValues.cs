@@ -1,4 +1,4 @@
-﻿namespace Data.models;
+﻿namespace ImplementationBase.models;
 
 internal static class StaticValues
 {

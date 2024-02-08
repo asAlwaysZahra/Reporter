@@ -1,6 +1,6 @@
-﻿using Data.models.enums;
+﻿using ImplementationBase.models.enums;
 
-namespace Data.models;
+namespace ImplementationBase.models;
 
 public class Task : IComparable<Task>
 {

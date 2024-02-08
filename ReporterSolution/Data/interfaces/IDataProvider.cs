@@ -2,5 +2,5 @@
 
 public interface IDataProvider
 {
-    IEnumerable<models.Task> GetData();
+    IEnumerable<models.Task> GetData(); 
 }

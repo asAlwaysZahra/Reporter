@@ -27,6 +27,9 @@ Dictionary<Assembly, List<Task>> activeData = new Dictionary<Assembly, List<Task
 // this method finds all different categories of tasks (TaskCategory is an enum)
 List<TaskCategory> categories = FindCategories(activeData);
 
+// log list
+List<string> logs = new();
+
 // main menu
 while (true)
 {
@@ -50,7 +53,7 @@ while (true)
                 input = Console.ReadLine();
 
                 // run report
-                RunReport(input, activeData, reporterDll);
+                RunReport(input, activeData, reporterDll, ref logs);
             }
             else break;
 
@@ -59,13 +62,25 @@ while (true)
             ExtensionManagement(ref activeData, ref activeData);
             break;
         case "3":
+            ShowLogHistory(logs);
+            break;
+        case "4":
             break;
         default:
+            Console.WriteLine("Please select a valid option!");
             break;
     }
 
     if (input == "4")
         break;
+}
+
+static void ShowLogHistory(List<string> logs)
+{
+    Console.WriteLine("History:\n");
+
+    foreach (var log in logs)
+        Console.WriteLine(log);
 }
 
 static (Assembly, List<Assembly>) LoadDlls()
@@ -143,7 +158,10 @@ static void ShowReports()
     Console.WriteLine("\n9. Back");
 }
 
-static void RunReport(string input, Dictionary<Assembly, List<Task>> tasks, Assembly reporter)
+static void RunReport(string input,
+                      Dictionary<Assembly, List<Task>> tasks,
+                      Assembly reporter,
+                      ref List<string> logs)
 {
     Console.WriteLine("\n=== Bootcamp Reporter :: An extendible command-line report tool ===\n");
 
@@ -165,9 +183,12 @@ static void RunReport(string input, Dictionary<Assembly, List<Task>> tasks, Asse
         case "3":
             methodName = "DoneBetween";
 
+            Console.Write("Please enter in format of 'MM/dd/yyy hh:mm'");
+            Console.Write("-first date:  ");
             string t = Console.ReadLine();
             t1 = DateTime.Parse(t);
 
+            Console.Write("- secons date:  ");
             t = Console.ReadLine();
             t2 = DateTime.Parse(t);
 
@@ -197,6 +218,9 @@ static void RunReport(string input, Dictionary<Assembly, List<Task>> tasks, Asse
         Console.WriteLine("Please select one option!");
         return;
     }
+
+    // log the report
+    LogReports(ref logs, methodName);
 
     List<List<Task>> result = [];
 
@@ -234,7 +258,7 @@ static void RunReport(string input, Dictionary<Assembly, List<Task>> tasks, Asse
     }
 }
 
-static void ExtensionManagement(ref Dictionary<Assembly, List<Task>> allData, 
+static void ExtensionManagement(ref Dictionary<Assembly, List<Task>> allData,
                                 ref Dictionary<Assembly, List<Task>> actives)
 {
     Console.WriteLine("Manage Extensions:\n");
@@ -283,8 +307,8 @@ static void ExtensionManagement(ref Dictionary<Assembly, List<Task>> allData,
 
 }
 
-static bool ChangeExtensionState(Dictionary<Assembly, List<Task>> allData, 
-                                 ref Dictionary<Assembly, List<Task>> actives, 
+static bool ChangeExtensionState(Dictionary<Assembly, List<Task>> allData,
+                                 ref Dictionary<Assembly, List<Task>> actives,
                                  string name)
 {
     bool found = false;
@@ -345,6 +369,11 @@ static bool IsValidDataDll(Assembly assm)
             .GetTypes()
             .Where(t => typeof(IDataProvider).IsAssignableFrom(t) && !t.IsInterface)
             .Any();
+}
+
+static void LogReports(ref List<string> logs, string operation)
+{
+    logs.Add($"Run '{operation}' on {DateTime.Now}");
 }
 
 //class EFContext : DbContext

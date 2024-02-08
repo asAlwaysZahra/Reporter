@@ -2,15 +2,16 @@
 using ImplementationBase.interfaces;
 using ImplementationBase.models.enums;
 using System.Reflection;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using Task = ImplementationBase.models.Task;
 
 
 (Assembly reporterDll, List<Assembly> dataDll) = LoadDlls();
 
-//var providerType = dataDll.GetTypes().Where(t => t.GetInterface("IDataProvider") != null).First();
-
+// to maintain all data dll files and thier data (list of tasks)
 Dictionary<Assembly, List<Task>> allData = [];
 
+// collect all data provided by GetData method (declared in IDataProvider interface)
 foreach (var assm in dataDll)
 {
     var providerType = assm.GetTypes().Where(t => t.GetInterface("IDataProvider") != null).First();
@@ -20,7 +21,11 @@ foreach (var assm in dataDll)
     allData.Add(assm, data);
 }
 
-List<TaskCategory> categories = FindCategories(allData);
+// I assume that at the begining, all extensions are enabeld
+Dictionary<Assembly, List<Task>> activeData = new Dictionary<Assembly, List<Task>>(allData);
+
+// this method finds all different categories of tasks (TaskCategory is an enum)
+List<TaskCategory> categories = FindCategories(activeData);
 
 // main menu
 while (true)
@@ -45,14 +50,13 @@ while (true)
                 input = Console.ReadLine();
 
                 // run report
-                RunReport(input, allData, reporterDll);
+                RunReport(input, activeData, reporterDll);
             }
             else break;
 
             break;
         case "2":
-            Dictionary<Assembly, bool> assemblies = [];
-            ExtensionManagement(assemblies);
+            ExtensionManagement(ref activeData, ref activeData);
             break;
         case "3":
             break;
@@ -77,18 +81,9 @@ static (Assembly, List<Assembly>) LoadDlls()
 
     foreach (var file in files)
     {
-        var assem = Assembly.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), file));
-
-        bool o = assem
-                .GetTypes()
-                .Where(t => typeof(IDataProvider).IsAssignableFrom(t) && !t.IsInterface)
-                .Any();
-
-        if (o) dataAssemblies.Add(assem);
+        var assm = Assembly.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), file));
+        if (IsValidDataDll(assm)) dataAssemblies.Add(assm);
     }
-
-    //dllFile = new FileInfo(@".\plugins\DataProviderOne.dll");
-    //var dataDll = Assembly.LoadFile(dllFile.FullName);
 
     return (reporterDll, dataAssemblies);
 }
@@ -239,22 +234,26 @@ static void RunReport(string input, Dictionary<Assembly, List<Task>> tasks, Asse
     }
 }
 
-static void ExtensionManagement(Dictionary<Assembly, bool> assemblies)
+static void ExtensionManagement(ref Dictionary<Assembly, List<Task>> allData, 
+                                ref Dictionary<Assembly, List<Task>> actives)
 {
     Console.WriteLine("Manage Extensions:\n");
 
     Console.WriteLine("   Extension   |   State   ");
     Console.WriteLine("---------------|-----------");
 
-    foreach (var assm in assemblies.Keys)
+    foreach (var assm in allData.Keys)
     {
-        string state = assemblies[assm] ? "Enable" : "Disable";
+        string state = (actives.ContainsKey(assm)) ? "Enable" : "Disable";
         Console.WriteLine(assm.GetName() + "  |  " + state);
     }
 
+    // show options in extension maangement part
     Console.WriteLine("\n1. Change State of Extension");
-    Console.WriteLine("\n2. Back");
+    Console.WriteLine("\n2. Add New Extension");
+    Console.WriteLine("\n3. Back");
 
+    // get user choice
     string input = Console.ReadLine();
 
     switch (input)
@@ -262,22 +261,91 @@ static void ExtensionManagement(Dictionary<Assembly, bool> assemblies)
         case "1":
             Console.WriteLine("Enter name of extension:");
             input = Console.ReadLine();
-            ChangeExtensionState(input);
+
+            bool success = ChangeExtensionState(allData, ref actives, input);
+
+            if (success)
+                Console.WriteLine("State Changed Successfully!");
+            else
+                Console.WriteLine("Something went wrong in changing the state :(");
+
             break;
         case "2":
+            AddNewExtension(ref allData);
+            break;
+        case "3":
             return;
             break;
         default:
+            Console.WriteLine("Wrong Input!");
             break;
     }
 
 }
 
-static void ChangeExtensionState(string name)
+static bool ChangeExtensionState(Dictionary<Assembly, List<Task>> allData, 
+                                 ref Dictionary<Assembly, List<Task>> actives, 
+                                 string name)
 {
-    throw new NotImplementedException();
+    bool found = false;
+
+    foreach (var assm in allData.Keys)
+    {
+        if (assm.FullName.StartsWith(name) && !actives.ContainsKey(assm))
+        {
+            actives.Add(assm, allData[assm]);
+            found = true;
+            break;
+        }
+    }
+
+    return found;
 }
 
+static void AddNewExtension(ref Dictionary<Assembly, List<Task>> allData)
+{
+
+    Console.WriteLine("* (Please notice that your file must be located in 'plugins' folder");
+    Console.WriteLine("   and also it should be implemented 'IDataProvider' interface!) *");
+
+    Console.Write("Enter the name of your .dll file:");
+
+    string name = Console.ReadLine();
+
+    var dllFile = new FileInfo(@$".\plugins\{name}.dll");
+    var assm = Assembly.LoadFile(dllFile.FullName);
+
+    var data = CollectAssemblyTasks(assm);
+
+    allData.Add(assm, data);
+}
+
+static List<Task> CollectAssemblyTasks(Assembly assm)
+{
+
+    if (IsValidDataDll(assm))
+    {
+        var providerType = assm.GetTypes().Where(t => t.GetInterface("IDataProvider") != null).First();
+
+        var getDataMethod = providerType.GetMethod("GetData");
+
+        var data = (List<Task>)getDataMethod.Invoke(Activator.CreateInstance(providerType), null);
+
+        return data;
+    }
+    else
+    {
+        throw new ArgumentException("Something went wrong in collecting assembly tasks data!");
+    }
+}
+
+static bool IsValidDataDll(Assembly assm)
+{
+    return assm
+            .GetTypes()
+            .Where(t => typeof(IDataProvider).IsAssignableFrom(t) && !t.IsInterface)
+            .Any();
+}
 
 //class EFContext : DbContext
 //{

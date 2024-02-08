@@ -1,5 +1,6 @@
-﻿using Reporter.enums;
+﻿using ImplementationBase.models.enums;
 using System.Data;
+using Task = ImplementationBase.models.Task;
 
 namespace Reporter;
 

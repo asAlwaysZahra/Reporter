@@ -226,11 +226,12 @@ public class Reporter
                                     .ToList();
 
         string methodName;
+        DateTime t1, t2;
 
         // beacause we may have error in date inputs
         try
         {
-            methodName = FindMethodAndArgs(input, out DateTime t1, out DateTime t2);
+            methodName = FindMethodAndArgs(input, out t1, out t2);
         } catch (FormatException ex)
         {
             // handled in previous catch

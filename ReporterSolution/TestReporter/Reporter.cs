@@ -139,8 +139,15 @@ public class Reporter
 
             if (returnValue is int r)
             {
-                Console.WriteLine(returnValue + "\n");
-                sumResult += r;
+                if (r == 0)
+                {
+                    Console.WriteLine("There is no task with the spicified conditions!");
+                }
+                else
+                {
+                    Console.WriteLine(returnValue + "\n");
+                    sumResult += r;
+                }
             }
             else if (returnValue is List<Task> res)
             {

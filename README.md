@@ -5,7 +5,8 @@ hi C# - 2
 
 First open the solution in Visual Studio and setup your sql server database (create a database named "ReporterLogsDB").
 
-Then, copy both tasks.json and plugins in this path: TestReporter/bin/Debug/net8.0 . 
+Then, copy both tasks.json and plugins folder (as it is) in this path: TestReporter/bin/Debug/net8.0 .
+The tasks.json file is needed for DataProviderTwo, it must be in the path specified.
 You can copy other .dll files with specified interface (in ImplementationBase project)
 in this path and run program. (even at runtime, you can do this by the option provided: Manage Extensions > Add New Extension)
 

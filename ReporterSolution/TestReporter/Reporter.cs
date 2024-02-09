@@ -5,6 +5,7 @@ using ImplementationBase.models;
 using Task = ImplementationBase.models.Task;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ImplementationBase.attributes;
 
 namespace TestReporter;
 
@@ -54,7 +55,7 @@ public class Reporter
         CollectAllDataFromDlls();
     }
 
-    public List<List<string>> DivideFiles(int treshold = 10, int divideInto = 4)
+    private List<List<string>> DivideFiles(int treshold = 10, int divideInto = 4)
     {
         var files = Directory.GetFiles(@".\plugins", "*.dll");
         int numberOfDlls = files.Length;
@@ -93,7 +94,7 @@ public class Reporter
 
     public void LoadParallel()
     {
-        List<List<string>> dividedFiles = DivideFiles(2, 2);
+        List<List<string>> dividedFiles = DivideFiles();
 
         foreach (var files in dividedFiles)
         {
@@ -217,7 +218,11 @@ public class Reporter
 
         // get the TaskProcessor calss that contains query methods
         var processor = ReporterDll.GetType("Reporter.TaskProcessor");
-        var queryMethods = processor.GetMethods();
+
+        var queryMethods = processor.GetMethods()
+                                    .Where(mi => mi.GetCustomAttributes()
+                                    .Any(at => at.GetType() == typeof(BootcampReportAttribute)))
+                                    .ToList();
 
 
         string methodName = FindMethodAndArgs(input, out DateTime t1, out DateTime t2);
@@ -225,6 +230,11 @@ public class Reporter
         if (methodName == "")
         {
             Console.WriteLine("Please select one option!");
+            return;
+        }
+        else if (methodName == "back")
+        {
+            Console.WriteLine("Back to the main menu.");
             return;
         }
 
@@ -322,7 +332,7 @@ public class Reporter
         return filtered;
     }
 
-    private ReturnType DetectReturnType(string methodName, MethodInfo[] queryMethods)
+    private ReturnType DetectReturnType(string methodName, List<MethodInfo> queryMethods)
     {
         // find method
         MethodInfo methodInfo = queryMethods.Where(q => q.Name == methodName).First();
@@ -383,7 +393,7 @@ public class Reporter
 
     }
 
-    public bool ChangeExtensionState(string name)
+    private bool ChangeExtensionState(string name)
     {
         bool found = false;
 
@@ -425,7 +435,7 @@ public class Reporter
         ActiveExtensions.Add(assm, data);
     }
 
-    public List<Task> CollectAssemblyTasks(Assembly assm)
+    private List<Task> CollectAssemblyTasks(Assembly assm)
     {
         if (IsValidDataDll(assm))
         {
@@ -443,11 +453,12 @@ public class Reporter
         }
     }
 
-    public bool IsValidDataDll(Assembly assembly)
+    private static bool IsValidDataDll(Assembly assembly)
              => assembly
                 .GetTypes()
                 .Where(t => typeof(IDataProvider).IsAssignableFrom(t) && !t.IsInterface)
-                .Any();
+                .Any(t => t.GetCustomAttributes()
+                .Any(att => att.GetType() == typeof(BootcampExtensionAttribute)));
 
     public void LogReports(string operation, bool error)
     {
@@ -455,7 +466,7 @@ public class Reporter
         Logger.LogMessage(log);
     }
 
-    public string FindMethodAndArgs(string input, out DateTime t1, out DateTime t2)
+    private static string FindMethodAndArgs(string input, out DateTime t1, out DateTime t2)
     {
         t1 = DateTime.Now;
         t2 = DateTime.Now;
@@ -499,6 +510,8 @@ public class Reporter
             case "8":
                 methodName = "GetUncopmletedTasksByPriority";
                 break;
+            case "9":
+                return "back";
             default:
                 Console.Error.WriteLine("Please select a valid option :/");
                 break;
@@ -521,7 +534,7 @@ public class Reporter
         return !found;
     }
 
-    enum ReturnType
+    private enum ReturnType
     {
         Int,
         List

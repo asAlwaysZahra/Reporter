@@ -1,9 +1,11 @@
 ﻿using ImplementationBase.models.enums;
 using ImplementationBase.interfaces;
 using Task = ImplementationBase.models.Task;
+using ImplementationBase.attributes;
 
 namespace DataProviderOne;
 
+[BootcampExtension("DataProviderTwo")]
 public class DataProvider : IDataProvider
 {
     public IEnumerable<Task> GetData()

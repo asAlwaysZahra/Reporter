@@ -27,27 +27,27 @@ class Program
                     Menu.ShowCategories(categories);
 
                     // select category:
-                    input = Console.ReadLine();
+                    string cat = Console.ReadLine();
 
-                    if (Convert.ToInt32(input) > categories.Count)
+                    if (Convert.ToInt32(cat) > categories.Count)
                     {
                         Console.WriteLine("Invalid category!");
                     }
                     else
                     {
                         // 0 shows back
-                        if (input != "0")
+                        if (cat != "0")
                         {
-                            TaskCategory selectedCategory = categories[Convert.ToInt32(input) - 1];
+                            TaskCategory selectedCategory = categories[Convert.ToInt32(cat) - 1];
 
                             // show report options
                             Menu.ShowReports();
 
                             // select report:
-                            input = Console.ReadLine();
+                            string rep = Console.ReadLine();
 
                             // run report
-                            reporter.RunReport(input, selectedCategory);
+                            reporter.RunReport(rep, selectedCategory);
                         }
                     }
                     break;
@@ -96,28 +96,7 @@ class Program
 
         Console.WriteLine($"Diff = {timeSpent2 - timeSpent1} ms");
 
-        Console.WriteLine("\nPress any key to continue..");
+        Console.WriteLine("\nPress enter key to continue..");
         Console.ReadLine();
     }
 }
-
-//class EFContext : DbContext
-//{
-//    public DbSet<Task> Tasks;
-
-//    protected override void OnConfiguring(DbContextOptionsBuilder builder)
-//    {
-//        builder.UseSqlServer(@"Data Source= Server=localhost\SQLEXPRESS;Database=master;Trusted_Connection=True;");
-//    }
-//}
-
-//[AttributeUsage(AttributeTargets.Method, Inherited = false)]
-//class ReportExtensionAttribute : Attribute
-//{
-//    public string Message { get; set; }
-
-//    public ReportExtensionAttribute(string message)
-//    {
-//        Message = message;
-//    }
-//}

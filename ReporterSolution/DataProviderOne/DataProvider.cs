@@ -1,9 +1,11 @@
 ﻿using DataProviderOne.DataReader;
+using ImplementationBase.attributes;
 using ImplementationBase.interfaces;
 using Task = ImplementationBase.models.Task;
 
 namespace DataProviderOne;
 
+[BootcampExtension("DataProviderOne")]
 public class DataProvider : IDataProvider
 {
     public IEnumerable<Task> GetData()

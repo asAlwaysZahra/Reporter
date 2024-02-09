@@ -11,4 +11,10 @@ in this path and run program. (even at runtime, you can do this by the option pr
 
 The startup project is TestReporter. You can run it and choose reports from menu to run on enable extensions.
 
+- Reporter project: this project is a class library that includes methods to run a report (using LinQ);
+- ImplementationBase: a class library that contains interfaces that should be implementd by a data provider;
+- DataProviders: class libraries that implement needed interfaces to provide data;
+- TestReporter: a console project that uses DataProvider and Reporter dll files to run reports on tasks provided by DataProvider.
+
+
 Note: there are 2 different DataDll files: DataProviderOne and DataProviderTwo that you can see their projects. others(DataProviderThree, .. , DataProvider16) are just copy of DataProviderOne :] to test functionality of code.

@@ -6,6 +6,9 @@ class Program
 {
     static void Main(string[] args)
     {
+        // first lets compare load times in normal and parallel ways :D
+        CompareLoadWays();
+
         // all aperation is done in this class
         Reporter reporter = new();
 
@@ -35,7 +38,7 @@ class Program
                         // 0 shows back
                         if (input != "0")
                         {
-                            TaskCategory selectedCategory = categories[Convert.ToInt32(input)-1];
+                            TaskCategory selectedCategory = categories[Convert.ToInt32(input) - 1];
 
                             // show report options
                             Menu.ShowReports();
@@ -66,6 +69,26 @@ class Program
                 return;
         }
     }
+
+    static void CompareLoadWays()
+    {
+        Reporter reporter = new();
+
+        reporter.AllExtensions.Clear();
+        DateTime start = DateTime.Now;
+        reporter.LoadDlls();
+        DateTime end = DateTime.Now;
+        Console.WriteLine("normal: " + end.Subtract(start).TotalMilliseconds + " ms");
+
+        reporter.AllExtensions.Clear();
+        start = DateTime.Now;
+        reporter.LoadParallel(reporter.DivideFiles());
+        end = DateTime.Now;
+        Console.WriteLine("parallel: " + end.Subtract(start).TotalMilliseconds + " ms");
+
+        Console.WriteLine("Press any key to continue..");
+        Console.ReadLine();
+    }
 }
 
 //class EFContext : DbContext
@@ -86,20 +109,5 @@ class Program
 //    public ReportExtensionAttribute(string message)
 //    {
 //        Message = message;
-//    }
-//}
-
-//int n = 20;
-
-//if (n > 10)
-//{
-//    int m = n % 10;
-//    for (int i = 0; i < m; i++)
-//    {
-//        List<int> list = new List<int>();
-//        for (int j = 0; j < 10; j++)
-//        {
-//            list.Add(j);
-//        }
 //    }
 //}

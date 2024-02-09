@@ -50,18 +50,74 @@ public class Reporter
                 AllExtensions.Add(assm, []);
         }
 
-        // fill data with tasks that each dll provides
-        CollectDataDll();
+        // fill data lists in dictionary, with tasks that each dll provides
+        CollectAllDataFromDlls();
     }
 
-    private void CollectDataDll()
+    public List<List<string>> DivideFiles(int treshold = 10, int divideInto = 4)
     {
-        // collect all data provided by GetData method (declared in IDataProvider interface)
+        var files = Directory.GetFiles(@".\plugins", "*.dll");
+        int numberOfDlls = files.Length;
+
+        List<List<string>> dividedFiles = new();
+
+        // if number of files is more than 'treshold',
+        // then divide them into groups of 'divideInto' files
+        if (numberOfDlls > treshold)
+        {
+            int repeats = numberOfDlls / divideInto + 1;
+
+            for (int i = 0; i < repeats; i++)
+            {
+                int from = i * divideInto;
+                int to = (i + 1) * divideInto;
+                to = Math.Min(to, numberOfDlls);
+
+                List<string> temp = new();
+
+                for (int j = from; j < to; j++)
+                {
+                    temp.Add(files[j]);
+                }
+
+                dividedFiles.Add(temp);
+            }
+        }
+        else
+        {
+            dividedFiles.Add(files.ToList());
+        }
+
+        return dividedFiles;
+    }
+
+    public void LoadParallel(List<List<string>> dividedFiles)
+    {
+        foreach (var files in dividedFiles)
+        {
+            System.Threading.Tasks.Task.Run(() =>
+            {
+                for (int i = 0; i < files.Count; i++)
+                {
+                    var assm = Assembly.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), files[i]));
+
+                    // just the ones that has implemented IDataProvider
+                    if (IsValidDataDll(assm))
+                        AllExtensions.Add(assm, []);
+                }
+            });
+        }
+
+        // fill data with tasks that each dll provides
+        CollectAllDataFromDlls();
+    }
+
+    private void CollectAllDataFromDlls()
+    {
+        // collect all data provided by GetData() method (declared in IDataProvider interface)
         foreach (var dataDll in AllExtensions.Keys)
         {
-            var providerType = dataDll.GetTypes().Where(t => t.GetInterface("IDataProvider") != null).First();
-            var getDataMethod = providerType.GetMethod("GetData");
-            var data = (List<Task>)getDataMethod.Invoke(Activator.CreateInstance(providerType), null);
+            var data = CollectAssemblyTasks(dataDll);
 
             // update tasks list for related assembly
             AllExtensions[dataDll] = data;
@@ -291,7 +347,6 @@ public class Reporter
 
     public void AddNewExtension()
     {
-
         Console.WriteLine("* (Please notice that your file must be located in 'plugins' folder");
         Console.WriteLine("   and also it should be implemented 'IDataProvider' interface!) *");
 
@@ -309,7 +364,6 @@ public class Reporter
 
     public List<Task> CollectAssemblyTasks(Assembly assm)
     {
-
         if (IsValidDataDll(assm))
         {
             var providerType = assm.GetTypes().Where(t => t.GetInterface("IDataProvider") != null).First();
@@ -322,7 +376,7 @@ public class Reporter
         }
         else
         {
-            throw new ArgumentException("Something went wrong in collecting assembly tasks data!");
+            throw new ArgumentException("Something went wrong in collecting assembly's tasks data!");
         }
     }
 

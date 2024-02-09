@@ -6,6 +6,7 @@ class Program
 {
     static void Main(string[] args)
     {
+        // all aperation is done in this class
         Reporter reporter = new();
 
         // this method finds all different categories of tasks (TaskCategory is an enum)
@@ -25,19 +26,27 @@ class Program
                     // select category:
                     input = Console.ReadLine();
 
-                    // 0 shows exit
-                    if (input != "0")
+                    if (Convert.ToInt32(input) > categories.Count)
                     {
-                        Menu.ShowReports();
-
-                        // select report:
-                        input = Console.ReadLine();
-
-                        // run report
-                        reporter.RunReport(input);
+                        Console.WriteLine("Invalid category!");
                     }
-                    else break;
+                    else
+                    {
+                        // 0 shows back
+                        if (input != "0")
+                        {
+                            TaskCategory selectedCategory = categories[Convert.ToInt32(input)-1];
 
+                            // show report options
+                            Menu.ShowReports();
+
+                            // select report:
+                            input = Console.ReadLine();
+
+                            // run report
+                            reporter.RunReport(input, selectedCategory);
+                        }
+                    }
                     break;
                 case "2":
                     reporter.ExtensionManagement();

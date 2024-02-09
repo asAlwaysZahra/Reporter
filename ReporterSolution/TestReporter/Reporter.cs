@@ -3,6 +3,8 @@ using ImplementationBase.models.enums;
 using System.Reflection;
 using ImplementationBase.models;
 using Task = ImplementationBase.models.Task;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace TestReporter;
 
@@ -84,7 +86,7 @@ public class Reporter
         return [.. categories];
     }
 
-    public void RunReport(string input)
+    public void RunReport(string input, TaskCategory selectedCategory)
     {
         Console.WriteLine("\n=== Bootcamp Reporter :: An extendible command-line report tool ===\n");
 
@@ -105,8 +107,12 @@ public class Reporter
 
         List<List<Task>> result = [];
 
-        int i = 0;
-        foreach (var taskList in ActiveExtensions.Values)
+        int i = 0, sumResult = 0;
+        List<List<Task>> allExtensionsResult = [];
+
+        Dictionary<Assembly, List<Task>> filtered = FilterByCategory(selectedCategory);
+
+        foreach (var taskList in filtered.Values)
         {
             // find method
             MethodInfo methodInfo = queryMethods.Where(q => q.Name == methodName).First();
@@ -118,16 +124,21 @@ public class Reporter
             var returnValue = methodInfo.Invoke(null, argg);
 
             // print result
-            string assmName = ActiveExtensions.Keys.ToArray()[i++].FullName.Split(" ")[0].Replace(",", "");
+            string assmName = filtered.Keys.ToArray()[i++].FullName
+                                                   .Split(" ")[0]
+                                                   .Replace(",", "");
 
             Console.Write($"Result of '{methodName}' : On '{assmName}'  =>  ");
 
-            if (returnValue is int)
+            if (returnValue is int r)
             {
                 Console.WriteLine(returnValue + "\n");
+                sumResult += r;
             }
             else if (returnValue is List<Task> res)
             {
+                allExtensionsResult.Add(res);
+
                 Console.WriteLine("\nTasks Count: " + res.Count);
                 Console.WriteLine("Tasks List: ");
 
@@ -135,8 +146,51 @@ public class Reporter
                     Console.WriteLine(task);
             }
 
-            Console.WriteLine("~~~~~~~~~");
+            Console.WriteLine("~~~~");
         }
+
+        int allCount;
+
+        if (DetectReturnType(methodName, queryMethods) == ReturnType.List)
+        {
+            // flat all results and count them
+            allCount = allExtensionsResult.SelectMany(t => t).Count();
+        }
+        else
+        {
+            allCount = sumResult;
+        }
+
+        Console.WriteLine($"\n~~ Count Result of All Enable Extensions = {allCount} ~~\n");
+    }
+
+    private Dictionary<Assembly, List<Task>> FilterByCategory(TaskCategory selectedCategory)
+    {
+        Dictionary<Assembly, List<Task>> filtered = [];
+
+        foreach (var key in ActiveExtensions.Keys)
+        {
+            var tasks = ActiveExtensions[key];
+
+            var filteredTasks = tasks
+                                .Where(t => t.Category.Equals(selectedCategory))
+                                .ToList();
+
+            filtered.Add(key, filteredTasks);
+        }
+
+        return filtered;
+    }
+
+    private ReturnType DetectReturnType(string methodName, MethodInfo[] queryMethods)
+    {
+        // find method
+        MethodInfo methodInfo = queryMethods.Where(q => q.Name == methodName).First();
+
+        if (methodInfo.ReturnType == typeof(int))
+            return ReturnType.Int;
+        else
+            return ReturnType.List;
     }
 
     public void ExtensionManagement()
@@ -241,13 +295,11 @@ public class Reporter
         }
     }
 
-    public bool IsValidDataDll(Assembly assm)
-    {
-        return assm
+    public bool IsValidDataDll(Assembly assembly)
+             => assembly
                 .GetTypes()
                 .Where(t => typeof(IDataProvider).IsAssignableFrom(t) && !t.IsInterface)
                 .Any();
-    }
 
     public void LogReports(string operation)
     {
@@ -302,5 +354,11 @@ public class Reporter
         }
 
         return methodName;
+    }
+
+    enum ReturnType
+    {
+        Int,
+        List
     }
 }

@@ -14,7 +14,7 @@ public class Reporter
     // to maintain all data .dll files and thier data (which is a list of tasks):
     public Dictionary<Assembly, List<Task>> AllExtensions { get; set; }
     public Dictionary<Assembly, List<Task>> ActiveExtensions { get; set; }
-    public List<string> Logs { get; set; }
+    public List<Log> Logs { get; set; }
 
     public Reporter()
     {
@@ -29,7 +29,7 @@ public class Reporter
         Console.WriteLine("History:\n");
 
         foreach (var log in Logs)
-            Console.WriteLine(log);
+            Console.WriteLine($"{log.Message} on {log.Time}, error: {log.IsError}");
     }
 
     public void LoadDlls()
@@ -93,7 +93,7 @@ public class Reporter
 
     public void LoadParallel()
     {
-        List<List<string>> dividedFiles = DivideFiles(2,2);
+        List<List<string>> dividedFiles = DivideFiles(2, 2);
 
         foreach (var files in dividedFiles)
         {
@@ -228,7 +228,7 @@ public class Reporter
         }
 
         // first, log the report
-        LogReports(methodName);
+        LogReports(methodName, false);
 
         List<List<Task>> result = [];
 
@@ -448,9 +448,10 @@ public class Reporter
                 .Where(t => typeof(IDataProvider).IsAssignableFrom(t) && !t.IsInterface)
                 .Any();
 
-    public void LogReports(string operation)
+    public void LogReports(string operation, bool error)
     {
-        Logs.Add($"Run '{operation}' on {DateTime.Now}");
+        Log log = new($"Run '{operation}'", DateTime.Now, error);
+        Logs.Add(log);
     }
 
     public string FindMethodAndArgs(string input, out DateTime t1, out DateTime t2)

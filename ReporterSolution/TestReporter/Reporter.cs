@@ -11,7 +11,6 @@ namespace TestReporter;
 public class Reporter
 {
     public Assembly ReporterDll { get; set; }
-    public List<Assembly> DataAssemblies { get; set; }
     // to maintain all data .dll files and thier data (which is a list of tasks):
     public Dictionary<Assembly, List<Task>> AllExtensions { get; set; }
     public Dictionary<Assembly, List<Task>> ActiveExtensions { get; set; }
@@ -19,7 +18,6 @@ public class Reporter
 
     public Reporter()
     {
-        DataAssemblies = new();
         AllExtensions = new();
         ActiveExtensions = new();
         Logs = new();
@@ -49,7 +47,7 @@ public class Reporter
 
             // just the ones that has implemented IDataProvider
             if (IsValidDataDll(assm))
-                DataAssemblies.Add(assm);
+                AllExtensions.Add(assm, []);
         }
 
         CollectDataDll();
@@ -58,13 +56,14 @@ public class Reporter
     private void CollectDataDll()
     {
         // collect all data provided by GetData method (declared in IDataProvider interface)
-        foreach (var assm in DataAssemblies)
+        foreach (var dataDll in AllExtensions.Keys)
         {
-            var providerType = assm.GetTypes().Where(t => t.GetInterface("IDataProvider") != null).First();
+            var providerType = dataDll.GetTypes().Where(t => t.GetInterface("IDataProvider") != null).First();
             var getDataMethod = providerType.GetMethod("GetData");
             var data = (List<Task>)getDataMethod.Invoke(Activator.CreateInstance(providerType), null);
 
-            AllExtensions.Add(assm, data);
+            // update tasks list for related assembly
+            AllExtensions[dataDll] = data;
         }
 
         // I assume that at the begining, all extensions are enabeld

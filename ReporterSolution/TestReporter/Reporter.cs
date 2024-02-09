@@ -210,6 +210,7 @@ public class Reporter
 
         if (EmptyActiveExtensions())
         {
+            Logger.LogMessage(new($"Run on {selectedCategory}", DateTime.Now, true));
             Console.WriteLine("Sorry, you can not run any report because there is no ENABLE extensions!");
             return;
         }

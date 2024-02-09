@@ -43,8 +43,9 @@ public class TaskProcessor
                     .ToList();
 
     // Q8
-    public static IEnumerable<Task> GetUncopmletedTasksByPriority(IEnumerable<Task> tasks, Priority pr) => tasks
-                    .Where(t => t.Priority == pr && !t.Done)
+    public static IEnumerable<Task> GetUncopmletedTasksByPriority(IEnumerable<Task> tasks) => tasks
+                    .Where(t => !t.Done)
+                    .OrderBy(t => t.Priority)
                     .ToList();
 
 }

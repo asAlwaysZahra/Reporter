@@ -109,7 +109,7 @@ public class Reporter
             return;
         }
 
-        // log the report
+        // first, log the report
         LogReports(methodName);
 
         List<List<Task>> result = [];
@@ -135,7 +135,7 @@ public class Reporter
                                                    .Split(" ")[0]
                                                    .Replace(",", "");
 
-            Console.Write($"Result of '{methodName}' : On '{assmName}'  =>  ");
+            Console.Write($"\nResult of '{methodName}' : On '{assmName}'  =>  ");
 
             if (returnValue is int r)
             {
@@ -144,13 +144,20 @@ public class Reporter
             }
             else if (returnValue is List<Task> res)
             {
-                allExtensionsResult.Add(res);
+                if (res.Count == 0)
+                {
+                    Console.WriteLine("There is no task with the spicified conditions!");
+                }
+                else
+                {
+                    allExtensionsResult.Add(res);
 
-                Console.WriteLine("\nTasks Count: " + res.Count);
-                Console.WriteLine("Tasks List: ");
+                    Console.WriteLine("\nTasks Count: " + res.Count);
+                    Console.WriteLine("Tasks List: ");
 
-                foreach (var task in res)
-                    Console.WriteLine(task);
+                    foreach (var task in res)
+                        Console.WriteLine(task);
+                }
             }
 
             Console.WriteLine("~~~~");
@@ -328,6 +335,7 @@ public class Reporter
         t1 = DateTime.Now;
         t2 = DateTime.Now;
         string methodName = "";
+
         switch (input)
         {
             case "1":
@@ -340,8 +348,9 @@ public class Reporter
             case "3":
                 methodName = "DoneBetween";
 
-                Console.Write("Please enter in format of 'MM/dd/yyy hh:mm'");
-                Console.Write("-first date:  ");
+                Console.WriteLine("Please enter dates in format of <MM/dd/yyyy hh:mm:ss>");
+
+                Console.Write("- first date:  ");
                 string t = Console.ReadLine();
                 t1 = DateTime.Parse(t);
 

@@ -13,32 +13,38 @@ public class TaskProcessor
     public static int CountCompletedTasks(IEnumerable<Task> tasks) => tasks.Where(t => t.Done).Count();
 
     // Q3
-    public static IEnumerable<Task> DoneBetween(IEnumerable<Task> tasks, DateTime t1, DataSetDateTime t2)
+    public static IEnumerable<Task> DoneBetween(IEnumerable<Task> tasks, DateTime t1, DateTime t2)
                     => tasks
-                    .Where(t => t.DoneAt.CompareTo(t1) > 0 && t.DoneAt.CompareTo(t2) < 0);
+                    .Where(t => t.DoneAt.CompareTo(t1) > 0 && t.DoneAt.CompareTo(t2) < 0)
+                    .ToList();
 
     // Q4
     public static IEnumerable<Task> GetUncopmpletedTasks(IEnumerable<Task> tasks) => tasks
-                    .Where(t => t.Done == false);
+                    .Where(t => t.Done == false)
+                    .ToList();
 
     // Q5
     public static IEnumerable<Task> GetOverduedTasks(IEnumerable<Task> tasks) => tasks
-                    .Where(t => t.Deadline.CompareTo(DateTime.Now) < 0);
+                    .Where(t => t.Deadline.CompareTo(DateTime.Now) < 0)
+                    .ToList();
 
     // Q6
     public static IEnumerable<Task> Get3CreatedMoreThan5Days(IEnumerable<Task> tasks) => tasks
                     .Where(t => (DateTime.Now - t.CreationDate).TotalDays > 5 && !t.Done)
                     .OrderByDescending(t => t.CreationDate)
-                    .Take(3);
+                    .Take(3)
+                    .ToList();
 
     // Q7
     public static IEnumerable<Task> Get3DoneAtDayCreated(IEnumerable<Task> tasks) => tasks
                     .Where(t => (t.DoneAt.DayOfYear == t.CreationDate.DayOfYear && t.Done))
                     .OrderByDescending(t => t.CreationDate)
-                    .Take(3);
+                    .Take(3)
+                    .ToList();
 
     // Q8
     public static IEnumerable<Task> GetUncopmletedTasksByPriority(IEnumerable<Task> tasks, Priority pr) => tasks
-                    .Where(t => t.Priority == pr && !t.Done);
+                    .Where(t => t.Priority == pr && !t.Done)
+                    .ToList();
 
 }

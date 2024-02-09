@@ -15,10 +15,8 @@ public class Logger
     public void LogMessage(Log log)
     {
         Logs.Add(log);
-        using (var context = new AppDbContext())
-        {
-            context.LogSet.Add(log);
-            context.SaveChanges();
-        }
+        using var context = new AppDbContext();
+        context.LogSet.Add(log);
+        context.SaveChanges();
     }
 }

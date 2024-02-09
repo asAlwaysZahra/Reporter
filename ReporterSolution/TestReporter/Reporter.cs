@@ -14,13 +14,13 @@ public class Reporter
     // to maintain all data .dll files and thier data (which is a list of tasks):
     public Dictionary<Assembly, List<Task>> AllExtensions { get; set; }
     public Dictionary<Assembly, List<Task>> ActiveExtensions { get; set; }
-    public List<Log> Logs { get; set; }
+    public Logger Logger;
 
     public Reporter()
     {
         AllExtensions = new();
         ActiveExtensions = new();
-        Logs = new();
+        Logger = new();
         LoadDlls();
     }
 
@@ -28,7 +28,7 @@ public class Reporter
     {
         Console.WriteLine("History:\n");
 
-        foreach (var log in Logs)
+        foreach (var log in Logger.Logs)
             Console.WriteLine($"{log.Message} on {log.Time}, error: {log.IsError}");
     }
 
@@ -451,7 +451,7 @@ public class Reporter
     public void LogReports(string operation, bool error)
     {
         Log log = new($"Run '{operation}'", DateTime.Now, error);
-        Logs.Add(log);
+        Logger.LogMessage(log);
     }
 
     public string FindMethodAndArgs(string input, out DateTime t1, out DateTime t2)

@@ -50,6 +50,7 @@ public class Reporter
                 AllExtensions.Add(assm, []);
         }
 
+        // fill data with tasks that each dll provides
         CollectDataDll();
     }
 
@@ -134,7 +135,7 @@ public class Reporter
                                                    .Split(" ")[0]
                                                    .Replace(",", "");
 
-            Console.Write($"\nResult of '{methodName}' : On '{assmName}'  =>  ");
+            Console.Write($"Result of '{methodName}' : On '{assmName}'  =>  ");
 
             if (returnValue is int r)
             {
@@ -144,7 +145,7 @@ public class Reporter
                 }
                 else
                 {
-                    Console.WriteLine(returnValue + "\n");
+                    Console.WriteLine(returnValue);
                     sumResult += r;
                 }
             }

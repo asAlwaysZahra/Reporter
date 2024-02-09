@@ -1,4 +1,5 @@
 ﻿using ImplementationBase.models.enums;
+using System.Text.Json.Serialization;
 
 namespace ImplementationBase.models;
 
@@ -14,6 +15,7 @@ public class Task : IComparable<Task>
     public DateTime DoneAt { get; set; }
     public TaskCategory Category { get; set; }
 
+    [JsonConstructor]
     public Task(int id, string title, string description, DateTime creationDate,
         DateTime deadline, Priority priority, bool done, DateTime doneAt, TaskCategory category)
     {

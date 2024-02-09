@@ -91,8 +91,10 @@ public class Reporter
         return dividedFiles;
     }
 
-    public void LoadParallel(List<List<string>> dividedFiles)
+    public void LoadParallel()
     {
+        List<List<string>> dividedFiles = DivideFiles(2,2);
+
         foreach (var files in dividedFiles)
         {
             System.Threading.Tasks.Task.Run(() =>
@@ -121,6 +123,66 @@ public class Reporter
 
             // update tasks list for related assembly
             AllExtensions[dataDll] = data;
+        }
+
+        // I assume that at the begining, all extensions are enabeld
+        ActiveExtensions = new Dictionary<Assembly, List<Task>>(AllExtensions);
+    }
+
+    private List<List<Assembly>> DivideAssemblies(int treshold = 10, int divideInto = 4)
+    {
+        var keys = ActiveExtensions.Keys.ToList();
+        int numberOfDlls = keys.Count;
+
+        List<List<Assembly>> divided = new();
+
+        // if number of assemblies is more than 'treshold',
+        // then divide them into groups of 'divideInto' assemblies
+        if (numberOfDlls > treshold)
+        {
+            int repeats = numberOfDlls / divideInto + 1;
+
+            for (int i = 0; i < repeats; i++)
+            {
+                int from = i * divideInto;
+                int to = (i + 1) * divideInto;
+                to = Math.Min(to, numberOfDlls);
+
+                List<Assembly> temp = [];
+
+                for (int j = from; j < to; j++)
+                {
+                    temp.Add(keys[j]);
+                }
+
+                divided.Add(temp);
+            }
+        }
+        else
+        {
+            divided.Add([.. ActiveExtensions.Keys]);
+        }
+
+        return divided;
+    }
+
+    private void CollectAllDataParallel()
+    {
+        var divided = DivideAssemblies(2, 2);
+
+        foreach (var assemblyList in divided)
+        {
+            System.Threading.Tasks.Task.Run(() =>
+            {
+                // collect all data provided by GetData() method (declared in IDataProvider interface)
+                foreach (var dataDll in assemblyList)
+                {
+                    var data = CollectAssemblyTasks(dataDll);
+
+                    // update tasks list for related assembly
+                    AllExtensions[dataDll] = data;
+                }
+            });
         }
 
         // I assume that at the begining, all extensions are enabeld

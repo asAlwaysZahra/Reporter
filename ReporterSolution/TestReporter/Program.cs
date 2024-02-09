@@ -72,21 +72,31 @@ class Program
 
     static void CompareLoadWays()
     {
+        Console.WriteLine("first lets compare load times in normal and parallel ways :D");
+
         Reporter reporter = new();
 
         reporter.AllExtensions.Clear();
+
         DateTime start = DateTime.Now;
         reporter.LoadDlls();
         DateTime end = DateTime.Now;
-        Console.WriteLine("normal: " + end.Subtract(start).TotalMilliseconds + " ms");
+        double timeSpent1 = end.Subtract(start).TotalMilliseconds;
+        Console.WriteLine($"normal: {timeSpent1} ms");
+
+        // -------------------------------------------------------
 
         reporter.AllExtensions.Clear();
-        start = DateTime.Now;
-        reporter.LoadParallel(reporter.DivideFiles());
-        end = DateTime.Now;
-        Console.WriteLine("parallel: " + end.Subtract(start).TotalMilliseconds + " ms");
 
-        Console.WriteLine("Press any key to continue..");
+        start = DateTime.Now;
+        reporter.LoadParallel();
+        end = DateTime.Now;
+        double timeSpent2 = end.Subtract(start).TotalMilliseconds;
+        Console.WriteLine($"parallel: {timeSpent2} ms");
+
+        Console.WriteLine($"Diff = {timeSpent2 - timeSpent1} ms");
+
+        Console.WriteLine("\nPress any key to continue..");
         Console.ReadLine();
     }
 }

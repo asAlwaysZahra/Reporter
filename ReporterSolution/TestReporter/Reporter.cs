@@ -90,6 +90,13 @@ public class Reporter
     {
         Console.WriteLine("\n=== Bootcamp Reporter :: An extendible command-line report tool ===\n");
 
+        if (EmptyActiveExtensions())
+        {
+            Console.WriteLine("Sorry, you can not run any report because there is no ENABLE extensions!");
+            return;
+        }
+
+        // get the TaskProcessor calss that contains query methods
         var processor = ReporterDll.GetType("Reporter.TaskProcessor");
         var queryMethods = processor.GetMethods();
 
@@ -195,15 +202,17 @@ public class Reporter
 
     public void ExtensionManagement()
     {
-        Console.WriteLine("Manage Extensions:\n");
+        Console.WriteLine("\nManage Extensions:\n");
 
-        Console.WriteLine("   Extension   |   State   ");
-        Console.WriteLine("---------------|-----------");
+        Console.WriteLine("    Extension     |   State   ");
+        Console.WriteLine("------------------|-----------");
 
         foreach (var assm in AllExtensions.Keys)
         {
             string state = ActiveExtensions.ContainsKey(assm) ? "Enable" : "Disable";
-            Console.WriteLine(assm.GetName() + "  |  " + state);
+            string name = assm.FullName.Split(" ").ToArray()[0].Replace(",", "");
+
+            Console.WriteLine(name + "       " + state);
         }
 
         // show options in extension maangement part
@@ -217,15 +226,15 @@ public class Reporter
         switch (input)
         {
             case "1":
-                Console.WriteLine("Enter name of extension:");
+                Console.Write("Enter name of extension: ");
                 input = Console.ReadLine();
 
                 bool success = ChangeExtensionState(input);
 
                 if (success)
-                    Console.WriteLine("State Changed Successfully!");
+                    Console.WriteLine("\nState Changed Successfully!");
                 else
-                    Console.WriteLine("Something went wrong in changing the state :(");
+                    Console.WriteLine("\nSomething went wrong in changing the state :(");
 
                 break;
             case "2":
@@ -247,9 +256,17 @@ public class Reporter
 
         foreach (var assm in AllExtensions.Keys)
         {
-            if (assm.FullName.StartsWith(name) && !ActiveExtensions.ContainsKey(assm))
+            if (assm.FullName.StartsWith(name))
             {
-                ActiveExtensions.Add(assm, AllExtensions[assm]);
+                if (ActiveExtensions.ContainsKey(assm))
+                {
+                    ActiveExtensions.Remove(assm);
+                }
+                else
+                {
+                    ActiveExtensions.Add(assm, AllExtensions[assm]);
+                }
+
                 found = true;
                 break;
             }
@@ -354,6 +371,20 @@ public class Reporter
         }
 
         return methodName;
+    }
+
+    private bool EmptyActiveExtensions()
+    {
+        bool found = false;
+
+        foreach (var tasks in ActiveExtensions.Values)
+            if (tasks.Count > 0)
+            {
+                found = true;
+                break;
+            }
+
+        return !found;
     }
 
     enum ReturnType

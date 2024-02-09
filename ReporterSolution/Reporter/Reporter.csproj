@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EntityFramework" Version="6.4.4" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="ImplementationBase">
       <HintPath>..\ImplementationBase\bin\Debug\net8.0\ImplementationBase.dll</HintPath>
     </Reference>

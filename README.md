@@ -3,7 +3,7 @@ hi C# - 2
 
 ## How to run this project?
 
-First opent the solution in Visual Studio and setup your sql server database (create a database named "ReporterLogsDB").
+First open the solution in Visual Studio and setup your sql server database (create a database named "ReporterLogsDB").
 
 Then, copy both tasks.json and plugins in this path: TestReporter/bin/Debug/net8.0 . 
 You can copy other .dll files with specified interface (in ImplementationBase project)

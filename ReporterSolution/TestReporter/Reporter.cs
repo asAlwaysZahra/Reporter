@@ -6,6 +6,7 @@ using Task = ImplementationBase.models.Task;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ImplementationBase.attributes;
+using Microsoft.Extensions.Logging;
 
 namespace TestReporter;
 
@@ -211,7 +212,7 @@ public class Reporter
 
         if (EmptyActiveExtensions())
         {
-            Logger.LogMessage(new($"Run on {selectedCategory}", DateTime.Now, true));
+            LogReports(selectedCategory.ToString(), true);
             Console.WriteLine("Sorry, you can not run any report because there is no ENABLE extensions!");
             return;
         }
@@ -224,8 +225,17 @@ public class Reporter
                                     .Any(at => at.GetType() == typeof(BootcampReportAttribute)))
                                     .ToList();
 
+        string methodName;
 
-        string methodName = FindMethodAndArgs(input, out DateTime t1, out DateTime t2);
+        // beacause we may have error in date inputs
+        try
+        {
+            methodName = FindMethodAndArgs(input, out DateTime t1, out DateTime t2);
+        } catch (FormatException ex)
+        {
+            // handled in previous catch
+            return;
+        }
 
         if (methodName == "")
         {
@@ -486,13 +496,21 @@ public class Reporter
 
                 Console.WriteLine("Please enter dates in format of <MM/dd/yyyy hh:mm:ss>");
 
-                Console.Write("- first date:  ");
-                string t = Console.ReadLine();
-                t1 = DateTime.Parse(t);
+                try
+                {
+                    Console.Write("- first date:  ");
+                    string t = Console.ReadLine();
+                    t1 = DateTime.Parse(t);
 
-                Console.Write("- secons date:  ");
-                t = Console.ReadLine();
-                t2 = DateTime.Parse(t);
+                    Console.Write("- secons date:  ");
+                    t = Console.ReadLine();
+                    t2 = DateTime.Parse(t);
+                }
+                catch (FormatException ex)
+                {
+                    Console.WriteLine("Wring formt for dates. please try again!");
+                    throw ex;
+                }
 
                 break;
             case "4":

@@ -25,7 +25,7 @@ Reports are executed through **LINQ queries**, and every execution is logged int
   - How to execute those reports (LINQ-based logic)  
 
 - The **Reporter core library**:
-  - Provides the standard runtime for executing reports  
+  - Provides the runtime for executing reports  
   - Handles logging of report runs into **SQL Server**  
 
 - The **TestReporter console app**:
@@ -36,19 +36,19 @@ Reports are executed through **LINQ queries**, and every execution is logged int
 ---
 
 ## ✨ Key Capabilities
-- **Plugin-based architecture**: drop a DLL in `plugins/`, and it becomes available instantly  
-- **Extensible providers**: create your own by implementing `ImplementationBase` interfaces  
-- **Dynamic runtime loading**: enable/disable extensions without rebuilding the app  
-- **SQL Server logging**: execution logs stored in `ReporterLogsDB`  
-- **Console runner**: simple CLI for managing and running reports  
+- **Plugin-based architecture** → drop a DLL in `plugins/`, and it becomes available instantly  
+- **Extensible providers** → create your own by implementing `IDataProvider` from `ImplementationBase`  
+- **Dynamic runtime loading** → enable/disable extensions without rebuilding the app  
+- **SQL Server logging** → execution logs stored in `ReporterLogsDB`  
+- **Console runner** → simple CLI for managing and running reports  
 
 ---
 
 ## 🏗️ Project Architecture
-- **Reporter**: Core logic: report execution with LINQ  
-- **ImplementationBase**: Contracts & interfaces for providers  
-- **DataProviders**: Example plugins (`DataProviderOne`, `DataProviderTwo`, plus test clones)  
-- **TestReporter**: Console app for running & managing reports  
+- **Reporter** → Core logic: report execution with LINQ  
+- **ImplementationBase** → Contracts & interfaces for providers  
+- **DataProviders** → Example plugins (`DataProviderOne`, `DataProviderTwo`, plus test clones)  
+- **TestReporter** → Console app for running & managing reports  
 
 ---
 
@@ -86,17 +86,23 @@ CREATE DATABASE ReporterLogsDB;
 
 ## 🔌 Plugin Configuration
 
-1. Copy the `plugins` folder and `tasks.json` into:
+1. Copy the `plugins` folder into:
 
    ```
    TestReporter/bin/Debug/net8.0
    ```
 
-   > ⚠️ `tasks.json` is required for **DataProviderTwo**
+2. Copy the file **`tasks.json`** into the same folder:
 
-2. To add new providers, place their DLLs into the same folder.
+   ```
+   TestReporter/bin/Debug/net8.0/tasks.json
+   ```
 
-3. At runtime, use:
+   > ⚠️ `tasks.json` is required by **DataProviderOne**. Without it, that provider cannot run reports.
+
+3. To add new providers, place their DLLs into the same `plugins` folder.
+
+4. At runtime, use:
 
    ```
    Manage Extensions → Add New Extension
@@ -135,7 +141,7 @@ Reporter/
 │  ├─ DataProviders/         # Example providers
 │  └─ TestReporter/          # Console runner
 ├─ plugins/                  # Ready-to-use DLLs
-├─ tasks.json                # Required for DataProviderTwo
+├─ tasks.json                # Required for DataProviderOne
 └─ README.md
 ```
 
@@ -150,4 +156,3 @@ Guidelines:
 * Clean, documented code
 * Stick to `.NET 8`
 * Add/update tests if possible
-

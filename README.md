@@ -10,7 +10,7 @@ Designed for extensibility, dynamic report loading, and SQL-based logging.
 ---
 
 ## 📌 Overview
-**Reporter** is a modular framework for building and executing reports.  
+Internship project: **Reporter** is a modular framework for building and executing reports.  
 The core idea: **every report and data source is a plugin (DLL)** that can be dynamically loaded by the main console application (`TestReporter`).  
 
 Reports are executed through **LINQ queries**, and every execution is logged into a **SQL Server database (`ReporterLogsDB`)**.

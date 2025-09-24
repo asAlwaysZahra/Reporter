@@ -36,19 +36,19 @@ Reports are executed through **LINQ queries**, and every execution is logged int
 ---
 
 ## ✨ Key Capabilities
-- 🔌 **Plugin-based architecture** → drop a DLL in `plugins/`, and it becomes available instantly  
-- 🧩 **Extensible providers** → create your own by implementing `ImplementationBase` interfaces  
-- ⚡ **Dynamic runtime loading** → enable/disable extensions without rebuilding the app  
-- 🗃️ **SQL Server logging** → execution logs stored in `ReporterLogsDB`  
-- 🖥️ **Console runner** → simple CLI for managing and running reports  
+- 🔌 **Plugin-based architecture**: drop a DLL in `plugins/`, and it becomes available instantly  
+- 🧩 **Extensible providers**: create your own by implementing `ImplementationBase` interfaces  
+- ⚡ **Dynamic runtime loading**: enable/disable extensions without rebuilding the app  
+- 🗃️ **SQL Server logging**: execution logs stored in `ReporterLogsDB`  
+- 🖥️ **Console runner**: simple CLI for managing and running reports  
 
 ---
 
 ## 🏗️ Project Architecture
-- **Reporter** → Core logic: report execution with LINQ  
-- **ImplementationBase** → Contracts & interfaces for providers  
-- **DataProviders** → Example plugins (`DataProviderOne`, `DataProviderTwo`, plus test clones)  
-- **TestReporter** → Console app for running & managing reports  
+- **Reporter**: Core logic: report execution with LINQ  
+- **ImplementationBase**: Contracts & interfaces for providers  
+- **DataProviders**: Example plugins (`DataProviderOne`, `DataProviderTwo`, plus test clones)  
+- **TestReporter**: Console app for running & managing reports  
 
 ---
 
@@ -138,16 +138,6 @@ Reporter/
 ├─ tasks.json                # Required for DataProviderTwo
 └─ README.md
 ```
-
----
-
-## 📌 Roadmap
-
-* [ ] Add more export options (CSV/JSON/DB)
-* [ ] Unit tests for core & providers
-* [ ] Better documentation of base interfaces
-* [ ] Simple GUI (WPF/WinUI) for running reports
-* [ ] GitHub Actions CI/CD
 
 ---
 

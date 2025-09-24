@@ -36,11 +36,11 @@ Reports are executed through **LINQ queries**, and every execution is logged int
 ---
 
 ## ✨ Key Capabilities
-- 🔌 **Plugin-based architecture**: drop a DLL in `plugins/`, and it becomes available instantly  
-- 🧩 **Extensible providers**: create your own by implementing `ImplementationBase` interfaces  
-- ⚡ **Dynamic runtime loading**: enable/disable extensions without rebuilding the app  
-- 🗃️ **SQL Server logging**: execution logs stored in `ReporterLogsDB`  
-- 🖥️ **Console runner**: simple CLI for managing and running reports  
+- **Plugin-based architecture**: drop a DLL in `plugins/`, and it becomes available instantly  
+- **Extensible providers**: create your own by implementing `ImplementationBase` interfaces  
+- **Dynamic runtime loading**: enable/disable extensions without rebuilding the app  
+- **SQL Server logging**: execution logs stored in `ReporterLogsDB`  
+- **Console runner**: simple CLI for managing and running reports  
 
 ---
 
